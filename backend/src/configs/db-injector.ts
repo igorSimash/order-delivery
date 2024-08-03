@@ -8,7 +8,7 @@ export const getDatabaseConnector = () => {
   }
 
   const config = {
-    client: "mysql",
+    client: "mysql2",
     connection: {
       host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT),
