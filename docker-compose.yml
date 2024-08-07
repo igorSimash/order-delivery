@@ -1,0 +1,53 @@
+services:
+  backend:
+    container_name: "backend"
+    restart: always
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - DB_HOST=mysql_server
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=3333
+      - DB_NAME=delivery_requests
+      - JWT_SALT=5w2E@:B:wayL*LzhV+HlK=RD-OmwKw0oC2QjyPkAi-@PgtWeZVbpWMtiXvXzyXVM
+    ports:
+      - 5000:5000
+    depends_on:
+      - mysql_server
+    links:
+      - mysql_server
+    networks:
+      - mynetwork
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:5000/api
+      - NEXT_PUBLIC_API_URL_COMPILE=http://backend:5000/api
+    depends_on:
+      - backend
+    links:
+      - backend
+    networks:
+      - mynetwork
+
+  mysql_server:
+    image: mysql:8.0
+    volumes:
+      - ./database/delivery-requests.sql:/docker-entrypoint-initdb.d/dump.sql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 3333
+      MYSQL_DATABASE: delivery_requests
+    networks:
+      - mynetwork
+networks:
+  mynetwork:
+    driver: bridge
